@@ -4,7 +4,7 @@ import requests
 import google.generativeai as genai
 from fastapi import FastAPI, Header, HTTPException, BackgroundTasks
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from dotenv import load_dotenv
 
 # --- STEP 1: LOAD SECRETS ---
@@ -17,8 +17,8 @@ if not GEMINI_KEY:
 
 # --- STEP 2: SETUP BRAIN (GEMINI) ---
 genai.configure(api_key=GEMINI_KEY)
-# Using 'gemini-1.5-flash' because it is fast and free
-model = genai.GenerativeModel('gemini-flash-latest')
+# FIXED: Used 'gemini-1.5-flash' for better stability during evaluation
+model = genai.GenerativeModel('gemini-1.5-flash')
 app = FastAPI()
 
 # --- STEP 3: THE PERSONA (RAMESH - THE HONEYPOT) ---
@@ -50,6 +50,8 @@ class IncomingRequest(BaseModel):
     sessionId: str
     message: Message
     conversationHistory: List[Message] = []
+    # FIXED: Added metadata field to prevent "422 Validation Error" from the judge's input
+    metadata: Optional[Dict[str, Any]] = None 
 
 class AgentResponse(BaseModel):
     status: str
@@ -112,7 +114,6 @@ async def chat_endpoint(request: IncomingRequest, background_tasks: BackgroundTa
         ai_reply = response.text.strip()
         
     except Exception as e:
-        # THIS IS THE IMPORTANT FIX: IT PRINTS THE ERROR
         print(f"❌ GEMINI ERROR: {e}") 
         ai_reply = "Beta, the internet is loose. Can you hear me?"
 
@@ -131,5 +132,5 @@ async def chat_endpoint(request: IncomingRequest, background_tasks: BackgroundTa
 
 if __name__ == "__main__":
     import uvicorn
-    # This starts the server on port 8000
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # This starts the server on port 10000 (Render default)
+    uvicorn.run(app, host="0.0.0.0", port=10000)
