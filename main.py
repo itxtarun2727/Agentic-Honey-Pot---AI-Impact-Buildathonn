@@ -18,7 +18,7 @@ if not GEMINI_KEY:
 # --- STEP 2: SETUP BRAIN (GEMINI) ---
 genai.configure(api_key=GEMINI_KEY)
 # FIXED: Used 'gemini-1.5-flash' for better stability during evaluation
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-1.5-flash-001')
 app = FastAPI()
 
 # --- STEP 3: THE PERSONA (RAMESH - THE HONEYPOT) ---
