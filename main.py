@@ -19,7 +19,7 @@ if not GEMINI_KEY:
 # --- STEP 2: SETUP BRAIN (GEMINI) ---
 genai.configure(api_key=GEMINI_KEY)
 # Using stable model version to prevent 404 errors
-model = genai.GenerativeModel('gemini-1.5-flash-001')
+model = genai.GenerativeModel('gemini-pro')
 
 app = FastAPI()
 
@@ -146,3 +146,4 @@ if __name__ == "__main__":
     import uvicorn
     # This starts the server on port 10000 (Render default)
     uvicorn.run(app, host="0.0.0.0", port=10000)
+    # Force update v2
