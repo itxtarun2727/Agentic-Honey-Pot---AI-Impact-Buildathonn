@@ -1,7 +1,7 @@
 import requests
 
 # 1. The URL of your bot (Localhost)
-url = "http://127.0.0.1:8000/chat"
+url = "https://agentic-honey-pot-ai-impact-buildathonn.onrender.com/chat"
 
 # 2. The Password you set in .env
 headers = {"x-api-key": "buildathon2026"}  # This should match API_SECRET_KEY in your .env file
