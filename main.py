@@ -3,6 +3,7 @@ import re
 import requests
 import google.generativeai as genai
 from fastapi import FastAPI, Header, HTTPException, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware  # <--- IMPORTED CORS
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from dotenv import load_dotenv
@@ -17,9 +18,20 @@ if not GEMINI_KEY:
 
 # --- STEP 2: SETUP BRAIN (GEMINI) ---
 genai.configure(api_key=GEMINI_KEY)
-# FIXED: Used 'gemini-1.5-flash' for better stability during evaluation
+# Using stable model version to prevent 404 errors
 model = genai.GenerativeModel('gemini-1.5-flash-001')
+
 app = FastAPI()
+
+# --- STEP 2.5: FIX FOR PORTAL TESTING (CORS) ---
+# This tells the server to allow the Hackathon Portal to connect
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all websites to talk to your bot
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (POST, GET, etc.)
+    allow_headers=["*"],  # Allows all headers (api-key, etc.)
+)
 
 # --- STEP 3: THE PERSONA (RAMESH - THE HONEYPOT) ---
 SYSTEM_PROMPT = """
@@ -50,7 +62,7 @@ class IncomingRequest(BaseModel):
     sessionId: str
     message: Message
     conversationHistory: List[Message] = []
-    # FIXED: Added metadata field to prevent "422 Validation Error" from the judge's input
+    # Added metadata field to prevent validation errors
     metadata: Optional[Dict[str, Any]] = None 
 
 class AgentResponse(BaseModel):
